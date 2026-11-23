@@ -9,3 +9,4 @@ resource "terraform_data" "project18" {
 output "project_name" {
   value = "Project 18 - GitOps Infrastructure Deployment"
 }
+# Project 18 - GitOps PR merge demonstration
