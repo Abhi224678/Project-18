@@ -4,14 +4,15 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - main
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
 
 jobs:
   terraform-plan:
     name: Terraform Plan
-    if: github.event_name == 'pull_request'
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
 
     steps:
@@ -24,17 +25,20 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend=false
 
+      - name: Terraform Validate
+        run: terraform validate
+
       - name: Terraform Plan
         run: terraform plan
 
   terraform-apply:
     name: Terraform Apply
-    if: github.event_name == 'push'
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-      - name: Checkout code
+      - name: Checkout merged code
         uses: actions/checkout@v4
 
       - name: Setup Terraform
